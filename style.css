@@ -815,3 +815,38 @@ h1, h2, h3 {
         display: none !important; 
     }
 }
+
+/* === PENGATURAN RESPONSIVE UNTUK LAYAR HP (MOBILE DEVICE) === */
+@media screen and (max-width: 768px) {
+    /* Menyesuaikan padding utama agar tidak mentok di pinggir layar HP */
+    main {
+        padding: 10px;
+    }
+
+    /* Mengubah tata letak bercabang (kiri-kanan) menjadi ke bawah (stack) */
+    .split-layout {
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+
+    /* Mengecilkan ukuran judul utama di beranda agar pas di layar HP */
+    .hero-title {
+        font-size: 2.5rem !important;
+    }
+
+    /* Memastikan panel kiri dan kanan menggunakan lebar penuh */
+    .left-panel, .right-panel {
+        width: 100% !important;
+        flex: none !important;
+    }
+
+    /* Menyesuaikan ukuran tombol navigasi dan menu agar mudah disentuh jari */
+    .hero-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .hero-buttons button {
+        width: 100%;
+    }
+}
