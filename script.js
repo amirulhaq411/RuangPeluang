@@ -189,11 +189,10 @@ document.addEventListener("DOMContentLoaded", () => {
             MathJax.typesetPromise([document.getElementById('freq-A'), document.getElementById('freq-G')]);
         }
 
-        let pctA = totalN === 0 ? 0 : (totalA / totalN) * 100;
-        let pctG = totalN === 0 ? 0 : (totalG / totalN) * 100;
-        
-        document.getElementById('bar-A').style.height = pctA + '%';
-        document.getElementById('bar-G').style.height = pctG + '%';
+        if (simulasiChartInstance) {
+            simulasiChartInstance.data.datasets[0].data = [totalA, totalG];
+            simulasiChartInstance.update();
+        }
 
         if (totalN >= 100) {
             const conclusion = document.getElementById('simulasi-conclusion');
@@ -344,11 +343,12 @@ document.addEventListener("DOMContentLoaded", () => {
             let pAc = (100 - val) / 100;
 
             sliderVal.innerText = pA.toFixed(2);
-            barA.style.width = val + '%';
-            barAc.style.width = (100 - val) + '%';
             
-            barA.innerText = val > 15 ? `P(A) = ${pA.toFixed(2)}` : "";
-            barAc.innerText = (100 - val) > 15 ? `P(A') = ${pAc.toFixed(2)}` : "";
+            // Memperbarui potongan grafik donat secara real-time dari pergeseran slider
+            if (komplemenChartInstance) {
+                komplemenChartInstance.data.datasets[0].data = [val, 100 - val];
+                komplemenChartInstance.update();
+            }
 
             if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
                 MathJax.typesetPromise([formulaDisplay]);
@@ -397,6 +397,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 const counter = document.getElementById('matrix-counter');
                 if(counter) counter.innerText = `Titik sampel ditemukan: ${markedCount} dari 36`;
 
+                // [CHART.JS] Tambahkan data ke grafik sesuai jumlah dadu (d1 + d2)
+                let jumlahDadu = d1 + d2;
+                dataJumlahDadu[jumlahDadu - 2]++; // Dikurangi 2 karena index array mulai dari 0 (untuk jumlah 2)
+                if (daduChartInstance) daduChartInstance.update();
+
                 if (markedCount === 36 && pblBox) {
                     pblBox.style.display = 'block';
                 }
@@ -408,6 +413,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnResetDadu) {
         btnResetDadu.addEventListener('click', () => {
             markedCount = 0;
+            // [CHART.JS] Kosongkan kembali grafik
+            dataJumlahDadu.fill(0);
+            if(daduChartInstance) daduChartInstance.update();
             const box1 = document.getElementById('dadu-1-box');
             const box2 = document.getElementById('dadu-2-box');
             if(box1) box1.innerText = '🎲';
@@ -460,27 +468,50 @@ document.addEventListener("DOMContentLoaded", () => {
     const fhOutputText = document.getElementById('fh-output-text');
     const fhFormulaDisplay = document.getElementById('fh-formula-display');
 
+    // [MODUL 5] Logika Slider Percobaan
     if (sliderPercobaan && valPercobaan) {
         sliderPercobaan.addEventListener('input', (e) => {
-            valPercobaan.innerText = e.target.value;
+            let n = parseInt(e.target.value);
+            valPercobaan.innerText = n;
+            
+            let fh = n / 6; 
+            if (fhChartInstance) {
+                // Saat slider digeser, perbarui HANYA garis merah (Harapan).
+                // Batang biru (Hasil nyata) dikosongkan lagi meminta siswa untuk klik simulasi.
+                fhChartInstance.data.datasets[0].data = [fh, fh, fh, fh, fh, fh];
+                fhChartInstance.data.datasets[1].data = [0, 0, 0, 0, 0, 0]; 
+                fhChartInstance.update();
+            }
+            if(fhOutputText) fhOutputText.innerHTML = "Klik tombol simulasi untuk melihat hasil!";
         });
     }
 
+    // [MODUL 5] Logika Tombol Simulasi Nyata
     if (btnHitungFh) {
         btnHitungFh.addEventListener('click', () => {
             let n = parseInt(sliderPercobaan.value);
-            let fh = (1 / 6) * n;
+            let fh = n / 6;
+
+            // MESIN PENGACAK DADU (Melahirkan data empirik)
+            let hasilSimulasi = [0, 0, 0, 0, 0, 0];
+            for(let i = 0; i < n; i++) {
+                let mataDadu = Math.floor(Math.random() * 6); // Menghasilkan 0 sampai 5
+                hasilSimulasi[mataDadu]++;
+            }
+
+            // Memasukkan hasil acak ke grafik batang biru
+            if (fhChartInstance) {
+                fhChartInstance.data.datasets[1].data = hasilSimulasi;
+                fhChartInstance.update();
+            }
 
             if (fhOutputText) {
-                // ==========================================
-                // [MATHJAX] MENEBALKAN ANGKA HASIL (mathbf)
-                // ==========================================
-                // \mathbf{} digunakan untuk menebalkan (bold) hasil hitungan JS di dalam renderan MathJax
-                fhOutputText.innerHTML = `$$F_h = \\frac{1}{6} \\times ${n} = \\mathbf{${Math.round(fh)}}\\text{ kali}$$`;
-                
-                if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
-                    MathJax.typesetPromise([fhOutputText]);
-                }
+                // Penjelasan Dinamis Hukum Bilangan Besar
+                fhOutputText.innerHTML = `<div style="font-size:1.1rem; color:#4A5568; line-height:1.5; font-weight:normal;">
+                    Secara teori, setiap sisi diharapkan muncul <strong>${fh.toFixed(1)}</strong> kali.<br>
+                    Namun pada kenyataannya, hasilnya berfluktuasi.<br><br>
+                    <span style="color:var(--accent-color); font-weight:bold; font-size:1.05rem;">Coba geser percobaan ke 600x!</span> Batang biru (hasil nyata) akan semakin merata dan mendekati garis merah (harapan).
+                </div>`;
             }
         });
     }
@@ -657,7 +688,8 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (quizContainer && quizResultScreen) {
             quizContainer.style.display = "none";
             quizResultScreen.style.display = "block";
-            if(finalScoreText) finalScoreText.innerText = `${quizScore} / ${quizData.length * 25}`;
+            // Pastikan pembaginya selalu / 100
+            if(finalScoreText) finalScoreText.innerText = `${quizScore} / 100`;
             
             // FITUR BARU: Mengambil nama dari Local Storage untuk ditaruh di sertifikat
             const namaSertifikat = document.getElementById('nama-sertifikat');
@@ -731,3 +763,150 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 });
+
+// === INISIALISASI CHART.JS UNTUK LAB SIMULASI KOIN ===
+let simulasiChartInstance = null;
+
+function initSimulasiChart() {
+    const ctx = document.getElementById('simulasiChart');
+    if (!ctx) return;
+
+    simulasiChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Angka (A)', 'Gambar (G)'],
+            datasets: [{
+                label: 'Banyak Muncul',
+                data: [0, 0],
+                backgroundColor: ['#6E9CEB', '#FFAB5E'],
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+}
+
+// Jalankan fungsi pembuatan grafik saat halaman siap
+initSimulasiChart();
+
+// === INISIALISASI CHART.JS UNTUK MODUL 3 (PELUANG KOMPLEMEN) ===
+let komplemenChartInstance = null;
+
+function initKomplemenChart() {
+    const ctx = document.getElementById('komplemenChart');
+    if (!ctx) return;
+
+    komplemenChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ["Peluang Terjadi P(A)", "Komplemen P(A')"],
+            datasets: [{
+                data: [40, 60], // Sesuai dengan nilai awal slider (40%)
+                backgroundColor: ['#6E9CEB', '#FFAB5E'],
+                borderWidth: 2,
+                hoverOffset: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            }
+        }
+    });
+}
+
+// Jalankan pembuatan grafik
+initKomplemenChart();
+
+// === INISIALISASI CHART.JS UNTUK MODUL 4 (DUA DADU) ===
+let daduChartInstance = null;
+let dataJumlahDadu = new Array(11).fill(0); // Array untuk menampung jumlah dadu (2 sampai 12)
+
+function initDaduChart() {
+    const ctx = document.getElementById('daduChart');
+    if (!ctx) return;
+
+    daduChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+            datasets: [{
+                label: 'Frekuensi Muncul',
+                data: dataJumlahDadu,
+                backgroundColor: '#FFAB5E', // Warna oranye aksen
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+// Jalankan pembuatan grafik
+initDaduChart();
+
+// === INISIALISASI CHART.JS UNTUK MODUL 5 (FREKUENSI HARAPAN VS KENYATAAN) ===
+let fhChartInstance = null;
+
+function initFhChart() {
+    const ctx = document.getElementById('fhChart');
+    if (!ctx) return;
+
+    fhChartInstance = new Chart(ctx, {
+        type: 'bar', // Tipe dasar
+        data: {
+            labels: ['Mata 1', 'Mata 2', 'Mata 3', 'Mata 4', 'Mata 5', 'Mata 6'],
+            datasets: [
+                {
+                    type: 'line', // Grafik Garis untuk Teori
+                    label: 'Target Harapan (Teori)',
+                    data: [10, 10, 10, 10, 10, 10], // Nilai awal saat n=60
+                    borderColor: '#E74C3C',
+                    backgroundColor: '#E74C3C',
+                    borderWidth: 3,
+                    borderDash: [5, 5], // Membuat garis putus-putus
+                    fill: false,
+                    tension: 0,
+                    order: 1 // Muncul di depan
+                },
+                {
+                    type: 'bar', // Grafik Batang untuk Kenyataan Simulasi
+                    label: 'Hasil Simulasi (Nyata)',
+                    data: [0, 0, 0, 0, 0, 0], // Awalnya kosong sebelum tombol ditekan
+                    backgroundColor: '#6E9CEB',
+                    borderRadius: 4,
+                    order: 2 // Muncul di belakang garis
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true } },
+            plugins: { legend: { display: true, position: 'bottom' } }
+        }
+    });
+}
+
+initFhChart();

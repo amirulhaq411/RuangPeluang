@@ -20,6 +20,8 @@
     </script>
     <!-- Memanggil library MathJax dari internet secara asinkronus (async) -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <!-- Memanggil Chart.js dari CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -198,9 +200,16 @@
             
             <div class="split-layout">
                 <div class="left-panel">
-                    <div class="instruction-box">
-                        <strong>Tugas Mandiri:</strong><br>
-                        Tarik (drag) semua kemungkinan sisi yang bisa muncul saat sebuah dadu dilempar ke dalam kotak Semesta di sebelah kanan!
+                    <!-- KOTAK PEMANTIK KONSEP -->
+                    <div style="background: #E8F4FD; border-left: 5px solid var(--primary-color); padding: 15px; border-radius: 10px; margin-bottom: 20px; color: #2C3E50; font-size: 0.95rem; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                        <strong style="font-size: 1.05rem; color: var(--primary-color);">💡 Pemantik Pemikiran:</strong><br><br>
+                        Setiap kali kita melakukan suatu percobaan, seperti melempar dadu atau koin, pasti ada berbagai kemungkinan hasil yang bisa terjadi.<br><br>
+                        Himpunan semua kemungkinan hasil ini disebut <strong>Ruang Sampel</strong>. Coba sebutkan, ada berapa saja kemungkinan sisi yang bisa muncul jika kita melempar satu buah dadu?
+                    </div>
+                    
+                    <div class="instruction-box" style="border-left-color: var(--accent-color);">
+                        <strong>Misi Penemuan:</strong><br>
+                        Tarik (drag) semua kemungkinan sisi yang bisa muncul saat sebuah dadu dilempar ke dalam kotak Semesta di sebelah kanan untuk menyusun Ruang Sampel!
                     </div>
                     
                     <div class="drag-container" id="drag-items">
@@ -245,7 +254,20 @@
             </div>
             
             <div class="split-layout">
-                <div class="left-panel" style="align-items: center; justify-content: center; background: rgba(255,255,255,0.7); border-radius: 20px; padding: 20px; border: 1px solid #fff;">
+                <div class="left-panel" style="align-items: center; justify-content: flex-start; background: rgba(255,255,255,0.7); border-radius: 20px; padding: 20px; border: 1px solid #fff;">
+                    
+                    <!-- KOTAK PEMANTIK KONSEP -->
+                    <div style="background: #E8F4FD; border-left: 5px solid var(--primary-color); padding: 15px; border-radius: 10px; margin-bottom: 20px; color: #2C3E50; font-size: 0.95rem; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.05); width: 100%;">
+                        <strong style="font-size: 1.05rem; color: var(--primary-color);">💡 Pemantik Pemikiran:</strong><br><br>
+                        Secara rumus (teori matematika), koin hanya memiliki 2 sisi. Artinya, peluang munculnya Angka adalah 1 dari 2, atau tepat 50%.<br><br>
+                        Tapi, apakah jika kita melempar koin di dunia nyata (empirik) hasilnya akan <strong>selalu</strong> pas 50% Angka dan 50% Gambar?
+                    </div>
+
+                    <div class="instruction-box" style="margin-bottom: 20px; border-left-color: var(--accent-color); width: 100%;">
+                        <strong>Misi Penemuan:</strong><br>
+                        Gunakan mesin koin di bawah ini untuk melempar koin sebanyak 10x hingga 100x. Perhatikan grafik di sebelah kanan, apakah semakin banyak lemparan, hasilnya akan semakin rata dan mendekati tebakan teori (50%)?
+                    </div>
+
                     <div class="coin-container" id="coin-simulator">
                         <div class="coin" id="the-coin">
                             <div class="coin-face coin-front">
@@ -300,15 +322,9 @@
                         </tbody>
                     </table>
 
-                    <div class="chart-container">
-                        <div class="bar-wrapper">
-                            <div class="bar bar-a" id="bar-A" style="height: 0%;"></div>
-                            <span>Angka</span>
-                        </div>
-                        <div class="bar-wrapper">
-                            <div class="bar bar-g" id="bar-G" style="height: 0%;"></div>
-                            <span>Gambar</span>
-                        </div>
+                    <!-- [CHART.JS] Area Kanvas Grafik Batang Interaktif -->
+                    <div style="width: 100%; max-width: 320px; margin: 15px auto;">
+                        <canvas id="simulasiChart"></canvas>
                     </div>
                     
                     <div id="simulasi-conclusion" class="conclusion-box" style="display: none; margin-top: 15px; border-left: 5px solid var(--accent-color);">
@@ -407,8 +423,16 @@
                 <!-- Panel Kiri: Slider Interaktif & Visualisasi -->
                 <div class="left-panel" style="background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
                     <h3 style="color: var(--primary-color); margin-bottom: 15px;">Eksperimen Interaktif</h3>
-                    <div class="instruction-box" style="margin-bottom: 20px;">
-                        Geser slider di bawah untuk mengubah peluang terjadinya suatu kejadian $A$ (misal: "Menang Lomba"), dan amati apa yang terjadi pada peluang komplemennya $A'$ ("Tidak Menang").
+                    <!-- KOTAK PEMANTIK KONSEP -->
+                    <div style="background: #E8F4FD; border-left: 5px solid var(--primary-color); padding: 15px; border-radius: 10px; margin-bottom: 20px; color: #2C3E50; font-size: 0.95rem; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                        <strong style="font-size: 1.05rem; color: var(--primary-color);">💡 Pemantik Pemikiran:</strong><br><br>
+                        Dalam probabilitas, nilai peluang selalu berkisar antara 0 (mustahil) hingga 1 (pasti terjadi), atau 0% hingga 100%.<br><br>
+                        Jika peluang sebuah tim memenangkan pertandingan adalah 30%, ke mana perginya sisa 70% tersebut? Hubungan saling melengkapi inilah yang disebut sebagai <strong>Peluang Komplemen (Bukan Kejadian)</strong>.
+                    </div>
+
+                    <div class="instruction-box" style="margin-bottom: 20px; border-left-color: var(--accent-color);">
+                        <strong>Misi Penemuan:</strong><br>
+                        Geser slider di bawah ini untuk mengubah nilai peluang Kejadian A, lalu amati apa yang otomatis terjadi pada grafik donat untuk Peluang Komplemennya (A')!
                     </div>
                     
                     <div style="margin-bottom: 20px; text-align: left;">
@@ -419,13 +443,9 @@
                     </div>
 
                     <!-- Bar Visualisasi Proporsi -->
-                    <div style="background: #E2E8F0; height: 35px; border-radius: 10px; display: flex; overflow: hidden; margin-top: 10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
-                        <div id="bar-A" style="background: var(--primary-color); width: 40%; transition: width 0.2s; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;">P(A)</div>
-                        <div id="bar-Ac" style="background: var(--accent-color); width: 60%; transition: width 0.2s; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;">P(A')</div>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.85rem; color: #666;">
-                        <span>0 (Mustahil)</span>
-                        <span>1 (Pasti)</span>
+                    <!-- [CHART.JS] Grafik Donat Peluang Komplemen -->
+                    <div style="width: 100%; max-width: 250px; margin: 20px auto;">
+                        <canvas id="komplemenChart"></canvas>
                     </div>
                 </div>
 
@@ -487,8 +507,16 @@
                         <button class="btn-secondary" id="btn-reset-dadu" style="padding: 12px; font-size: 1rem; cursor: pointer; z-index: 50; position: relative;">Reset</button>
                     </div>
 
-                    <div class="instruction-box" style="margin-top: 20px; font-size: 0.9rem;">
-                        <strong>Langkah 1:</strong> Temukan ke-36 titik sampel dengan mengklik tombol lempar hingga tabel penuh. Setelah itu, Misi Tantangan Peluang akan terbuka!
+                    <!-- KOTAK PEMANTIK KONSEP -->
+                    <div style="background: #E8F4FD; border-left: 5px solid var(--primary-color); padding: 15px; border-radius: 10px; margin-top: 20px; margin-bottom: 15px; color: #2C3E50; font-size: 0.95rem; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                        <strong style="font-size: 1.05rem; color: var(--primary-color);">💡 Pemantik Pemikiran:</strong><br><br>
+                        Melempar satu dadu hanya akan menghasilkan 6 kemungkinan. Tapi, bagaimana jika kita melempar <strong>dua dadu sekaligus</strong>?<br><br>
+                        Hasil dari dua dadu akan selalu membentuk pasangan angka (titik sampel). Kira-kira, ada berapa banyak total pasangan angka yang mungkin terjadi dari dua buah dadu?
+                    </div>
+
+                    <div class="instruction-box" style="font-size: 0.9rem; border-left-color: var(--accent-color);">
+                        <strong>Misi Penemuan:</strong><br>
+                        Klik tombol lempar terus-menerus hingga tabel matriks di sebelah kanan terisi penuh untuk menemukan total kemungkinannya. Setelah itu, Misi Penyelidikan Grafik akan terbuka!
                     </div>
                 </div>
 
@@ -504,8 +532,20 @@
                         <span style="font-size: 0.95rem; font-weight: bold; color: var(--primary-color);" id="matrix-counter">Titik sampel ditemukan: 0 dari 36</span>
                     </div>
 
+                    <!-- [CHART.JS] Histogram Jumlah Dua Dadu -->
+                    <div style="width: 100%; margin-top: 20px;">
+                        <canvas id="daduChart" height="120"></canvas>
+                    </div>
+
                     <!-- KOTAK MISI TANTANGAN PBL -->
                     <div id="pbl-challenge-box" style="display: none; margin-top: 20px; background: #F8FBFE; border: 2px dashed var(--accent-color); padding: 15px; border-radius: 14px; text-align: left;">
+                        
+                        <!-- [TAMBAHAN] Pembahasan Singkat Grafik -->
+                        <div style="background: white; padding: 12px 15px; border-radius: 10px; border-left: 4px solid var(--primary-color); margin-bottom: 15px; font-size: 0.9rem; color: #4A5568; line-height: 1.5; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                            <strong style="color: var(--primary-color);">📈 Analisis Grafik:</strong><br>
+                            Perhatikan bentuk grafik batang di atas! Grafik tersebut menampilkan <strong>sebaran jumlah kedua mata dadu</strong> (mulai dari 2 hingga 12). Bentuknya menyerupai gunung (simetris), yang membuktikan bahwa nilai yang berada di tengah memiliki kemungkinan muncul paling besar dibandingkan nilai di ujung (2 dan 12).
+                        </div>
+
                         <h4 style="color: var(--accent-color); margin-bottom: 8px;">🎯 Misi Penyelidikan Peluang</h4>
                         <p style="font-size: 0.9rem; color: #555; margin-bottom: 10px;">
                             Dari tabel 36 titik sampel di atas, berapa banyak pasangan angka (titik sampel) yang jika dijumlahkan hasilnya sama dengan <strong>7</strong>?
@@ -532,11 +572,23 @@
             
             <div class="split-layout" style="max-width: 1200px;">
                 <!-- Panel Kiri: Kontrol Simulasi Frekuensi Harapan -->
-                <div class="left-panel" style="background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                    <h3 style="color: var(--primary-color); margin-bottom: 15px;">Simulasi Lempar Dadu Berulang</h3>
-                    
-                    <div class="instruction-box" style="margin-bottom: 20px; font-size: 0.9rem;">
-                        Misalkan kita melempar sebuah dadu bermata 6 sebanyak beberapa kali. Berapa kali kita <em>berharap</em> muncul angka <strong>6</strong>?
+                <!-- KOTAK ORIENTASI MASALAH (Sintaks 1 PBL) -->
+                    <div style="background: #FFF3CD; border-left: 5px solid #FFC107; padding: 15px; border-radius: 10px; margin-bottom: 20px; color: #856404; font-size: 0.95rem; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                        <strong style="font-size: 1.05rem;">🕵️‍♂️ Orientasi Masalah:</strong><br><br>
+                        Budi sedang bermain permainan ular tangga. Untuk bisa mengeluarkan pionnya, ia harus mendapatkan mata dadu <strong>6</strong>. Jika dalam permainan itu Budi mendapat kesempatan melempar dadu sebanyak <strong>60 kali</strong>, berapa kali <em>kira-kira</em> Budi bisa berharap angka 6 itu muncul?<br><br>
+                        Apakah di dunia nyata hasilnya akan <strong>selalu persis</strong> dengan tebakan teori matematika?
+                    </div>
+
+                    <!-- KOTAK PEMANTIK KONSEP -->
+                    <div style="background: #E8F4FD; border-left: 5px solid var(--primary-color); padding: 15px; border-radius: 10px; margin-bottom: 20px; color: #2C3E50; font-size: 0.95rem; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                        <strong style="font-size: 1.05rem; color: var(--primary-color);">💡 Pemantik Pemikiran:</strong><br><br>
+                        Di modul sebelumnya, kita sudah belajar bahwa peluang munculnya setiap angka dadu adalah sama rata (yaitu 1/6).<br><br>
+                        Namun, bagaimana jika kita benar-benar melempar dadu tersebut sebanyak 60 kali? Apakah di dunia nyata setiap angka <strong>pasti</strong> muncul tepat 10 kali (sesuai ekspektasi matematika), atau angkanya akan berantakan?
+                    </div>
+
+                    <div class="instruction-box" style="margin-bottom: 20px; font-size: 0.9rem; border-left-color: var(--accent-color);">
+                        <strong>Misi Penemuan:</strong><br>
+                        Mari kita uji! Atur jumlah percobaan (n) pada slider, lalu klik "Jalankan Simulasi" untuk melihat secara langsung apakah kenyataan (batang biru) selalu patuh pada garis ekspektasi teori (garis merah).
                     </div>
 
                     <div style="margin-bottom: 20px; text-align: left;">
@@ -547,11 +599,10 @@
                     </div>
 
                     <div style="background: #F8FBFE; padding: 15px; border-radius: 12px; border: 1px solid #DCE4EC; margin-bottom: 15px;">
-                        <div style="font-size: 0.9rem; color: #555;">Peluang Muncul Angka 6 \([P(A)]\):</div>
-                        <div style="font-size: 1.1rem; font-weight: bold; color: var(--accent-color); margin: 5px 0;">\(P(6) = \frac{1}{6}\)</div>
-                    </div>
+                        <div style="font-size: 0.9rem; color: #555;">Peluang Teoritis Setiap Sisi Dadu \([P(A)]\):</div>
+                    <div style="font-size: 1.1rem; font-weight: bold; color: var(--accent-color); margin: 5px 0;">\(P(\text{Tiap Sisi}) = \frac{1}{6}\)</div>
 
-                    <button class="btn-primary" id="btn-hitung-fh" style="width: 100%; padding: 12px; font-size: 1rem; cursor: pointer;">Hitung Frekuensi Harapan 📊</button>
+                    <button class="btn-primary" id="btn-hitung-fh" style="width: 100%; padding: 12px; font-size: 1rem; cursor: pointer;">Jalankan Simulasi & Bandingkan 🎲</button>
                 </div>
 
                 <!-- Panel Kanan: Hasil & Penemuan Konsep -->
@@ -563,6 +614,11 @@
                         <div id="fh-output-text" style="font-size: 1.4rem; font-weight: bold; color: var(--primary-color);">
                             Klik tombol hitung untuk melihat hasil!
                         </div>
+                    </div>
+
+                    <!-- [CHART.JS] Grafik Frekuensi Harapan -->
+                    <div style="width: 100%; margin-bottom: 20px;">
+                        <canvas id="fhChart" height="100"></canvas>
                     </div>
 
                     <div class="conclusion-box" style="border-left: 5px solid var(--accent-color); text-align: left;">
