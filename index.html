@@ -23,118 +23,88 @@
     <!-- Memanggil Chart.js dari CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <!-- Memanggil Boxicons untuk Ikon Modern -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
 
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="brand" data-target="screen-1" style="cursor: pointer;">
-            <!-- ========================================== -->
-            <!-- [SVG] LOGO APLIKASI DI NAVBAR -->
-            <!-- ========================================== -->
-            <svg width="30" height="30" viewBox="0 0 100 100" fill="var(--primary-color)">
-                <!-- rect: Menggambar bentuk dasar kotak dengan sudut melengkung rx="15" -->
-                <rect x="10" y="10" width="80" height="80" rx="15"/>
-                <!-- circle: Menggambar dua lingkaran putih menyerupai titik dadu -->
-                <circle cx="30" cy="30" r="8" fill="white"/>
-                <circle cx="70" cy="70" r="8" fill="white"/>
-            </svg>
-            RuangPeluang
-        </div>
+    <!-- DASHBOARD WRAPPER -->
+    <div class="dashboard-wrapper">
         
-        <div class="nav-right">
-            <div class="nav-links">
-                <button class="nav-btn active" data-target="screen-1">Beranda</button>
-                <button class="nav-btn" data-target="screen-modules">Daftar Modul</button>
-                <button class="nav-btn" data-target="screen-quiz">Kuis</button>
+        <!-- SIDEBAR NAVIGASI (KIRI) -->
+        <aside class="sidebar">
+            <div class="brand" data-target="screen-1" style="cursor: pointer;">
+                <svg width="32" height="32" viewBox="0 0 100 100" fill="var(--primary-color)">
+                    <rect x="10" y="10" width="80" height="80" rx="20"/>
+                    <circle cx="30" cy="30" r="10" fill="white"/>
+                    <circle cx="70" cy="70" r="10" fill="white"/>
+                </svg>
+                <span>RuangPeluang</span>
             </div>
-            <button class="btn-outline" data-target="screen-tentang">Tentang</button>
-        </div>
-    </nav>
-
-    <!-- BACKGROUND DECORATIONS -->
-    <div class="bg-decorations">
-        <div class="decor blob-1"></div>
-        <div class="decor blob-2"></div>
-        <div class="decor math-symbol s1">÷</div>
-        <div class="decor math-symbol s2">×</div>
-        <div class="decor math-symbol s3">%</div>
-        <div class="decor math-symbol s4">+</div>
-    </div>
-
-    <!-- MAIN CONTAINER -->
-    <main id="app-container">
-        
-        <!-- SCREEN 1: BERANDA UTAMA -->
-        <section id="screen-1" class="screen active">
             
-            <!-- Panel Kiri: Fakta -->
-            <div class="fact-panel">
-                <h3>💡 Tahukah Kamu?</h3>
-                <div class="fact-card">
-                    <p>Teori peluang pertama kali dikembangkan pada abad ke-17 oleh Blaise Pascal dan Pierre de Fermat untuk memecahkan masalah dalam permainan dadu!</p>
+            <div class="sidebar-menu">
+                <div class="menu-label">MENU UTAMA</div>
+                <button class="nav-btn active" data-target="screen-1"><i class='bx bx-home-alt'></i> Beranda</button>
+                <button class="nav-btn" data-target="screen-modules"><i class='bx bx-book-content'></i> Daftar Modul</button>
+                <button class="nav-btn" data-target="screen-quiz"><i class='bx bx-task'></i> Kuis Evaluasi</button>
+                
+                <div class="menu-label" style="margin-top: 20px;">LAINNYA</div>
+                <button class="nav-btn" data-target="screen-tentang"><i class='bx bx-info-circle'></i> Tentang Media</button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT (KANAN) -->
+        <main id="app-container" class="main-content">
+        
+        <!-- SCREEN 1: BERANDA DASHBOARD -->
+        <section id="screen-1" class="screen active" style="align-items: stretch;">
+            
+            <!-- HERO BANNER (Sambutan) -->
+            <div class="hero-banner">
+                <div class="hero-text">
+                    <h1 style="font-size: 2.2rem; color: #1E293B; margin-bottom: 10px;">Halo, Pelajar! 👋</h1>
+                    <p style="color: #475569; font-size: 1.05rem; margin-bottom: 20px; max-width: 80%;">Selamat datang di Laboratorium Probabilitas. Mari selidiki rahasia di balik peluang suatu kejadian matematika.</p>
+                    
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="input-nama-siswa" placeholder="Ketik namamu..." style="padding: 10px 15px; border-radius: 10px; border: none; outline: none; width: 200px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                        <button class="btn-primary" id="btn-mulai-belajar" style="padding: 10px 20px; font-size: 0.95rem; border-radius: 10px;">Simpan & Mulai <i class='bx bx-right-arrow-alt'></i></button>
+                    </div>
+                    <div id="error-nama" style="color: #E74C3C; font-size: 0.85rem; margin-top: 5px; display: none;">Isi nama dulu ya!</div>
                 </div>
-                <div class="fact-card">
-                    <p>Jika kamu melempar koin 10.000 kali, hasilnya akan sangat mendekati 5.000 angka dan 5.000 gambar. Inilah yang disebut dengan <strong>Hukum Bilangan Besar</strong>.</p>
+                
+                <div class="hero-illustration" style="position: absolute; right: 30px; top: 0; height: 100%; display: flex; align-items: center; pointer-events: none; mix-blend-mode: multiply;">
+                    <img src="aset/ilustrasi-beranda.png" alt="Maskot Robo-Peluang" style="height: 95%; width: auto; object-fit: contain;">
                 </div>
             </div>
 
-            <!-- Panel Kanan Utama -->
-            <div class="main-hero-panel">
+            <!-- QUICK ACCESS CARDS -->
+            <div style="margin-top: 30px;">
+                <h3 style="color: #1E293B; font-size: 1.2rem; margin-bottom: 15px; text-align: left;"><i class='bx bxs-zap' style="color: #F59E0B;"></i> Akses Cepat Praktikum</h3>
                 
-                <!-- Dadu Kiri -->
-                <div class="hero-side">
-                    <!-- ========================================== -->
-                    <!-- [SVG] ILUSTRASI DADU DI BERANDA -->
-                    <!-- ========================================== -->
-                    <!-- viewBox menentukan area gambar (100x100 unit vektor) -->
-                    <svg class="svg-dice" viewBox="0 0 100 100" width="110" height="110">
-                        <!-- Kotak dasar dadu berwarna putih dengan garis tepi (stroke) -->
-                        <rect x="10" y="10" width="80" height="80" rx="20" fill="#FFFFFF" stroke="#DCE4EC" stroke-width="4"/>
-                        <!-- 5 titik dadu diatur berdasarkan koordinat tengah x (cx) dan y (cy) -->
-                        <circle cx="30" cy="30" r="9" fill="#FF8370"/>
-                        <circle cx="70" cy="70" r="9" fill="#FF8370"/>
-                        <circle cx="50" cy="50" r="9" fill="#FF8370"/>
-                        <circle cx="30" cy="70" r="9" fill="#FF8370"/>
-                        <circle cx="70" cy="30" r="9" fill="#FF8370"/>
-                    </svg>
-                </div>
-
-                <!-- Tengah: Splash Art, Judul RuangPeluang, & Tombol -->
-                <div class="hero-center">
-                    <img src="Splash Art.jpg" alt="Splash Art RuangPeluang" class="splash-art">
-                    
-                    <h1 class="hero-title" style="font-size: 4rem; margin-bottom: 1.5rem;">RuangPeluang</h1>
-                    
-                    <!-- FITUR BARU: Input Nama Siswa -->
-                    <div style="margin-bottom: 25px; width: 100%; max-width: 300px;">
-                        <input type="text" id="input-nama-siswa" placeholder="Masukkan namamu di sini..." style="width: 100%; padding: 12px 20px; border-radius: 30px; border: 2px solid var(--primary-color); font-size: 1rem; text-align: center; outline: none; box-shadow: 0 5px 15px rgba(110, 156, 235, 0.1);">
-                        <div id="error-nama" style="color: #E74C3C; font-size: 0.85rem; margin-top: 8px; display: none;">Namamu belum diisi, pahlawan!</div>
+                <div class="quick-access-grid">
+                    <div class="dash-card" data-target="screen-3">
+                        <div class="icon-box" style="background: #E0E7FF; color: #4F46E5;"><i class='bx bx-coin'></i></div>
+                        <h4>Lab Koin</h4>
+                        <p>Simulasi Peluang Empirik</p>
                     </div>
-                    
-                    <div class="hero-buttons">
-                        <!-- Perhatikan: data-target pada tombol ini kita hapus dulu, diganti id="btn-mulai-belajar" -->
-                        <button class="btn-primary" id="btn-mulai-belajar">Mulai Belajar 🚀</button>
-                        <button class="btn-secondary" data-target="screen-quiz">Langsung Kuis 🎯</button>
+                    <div class="dash-card" data-target="screen-modul-4">
+                        <div class="icon-box" style="background: #FEF3C7; color: #D97706;"><i class='bx bx-dice-5'></i></div>
+                        <h4>Lab Dua Dadu</h4>
+                        <p>Matriks Ruang Sampel</p>
+                    </div>
+                    <div class="dash-card" data-target="screen-modul-5">
+                        <div class="icon-box" style="background: #DCFCE7; color: #16A34A;"><i class='bx bx-bar-chart-alt-2'></i></div>
+                        <h4>Lab Frekuensi</h4>
+                        <p>Harapan vs Kenyataan</p>
+                    </div>
+                    <div class="dash-card" data-target="screen-quiz">
+                        <div class="icon-box" style="background: #FEE2E2; color: #DC2626;"><i class='bx bx-trophy'></i></div>
+                        <h4>Evaluasi</h4>
+                        <p>Uji Pemahaman Akhir</p>
                     </div>
                 </div>
-
-                <!-- Koin Kanan -->
-                <div class="hero-side">
-                    <!-- ========================================== -->
-                    <!-- [SVG] ILUSTRASI KOIN DI BERANDA -->
-                    <!-- ========================================== -->
-                    <svg class="svg-coin" viewBox="0 0 100 100" width="130" height="130">
-                        <!-- Lingkaran luar koin -->
-                        <circle cx="50" cy="50" r="45" fill="#FFCF59" stroke="#E5B022" stroke-width="5"/>
-                        <!-- Lingkaran dalam dengan efek garis putus-putus (stroke-dasharray) -->
-                        <circle cx="50" cy="50" r="35" fill="none" stroke="#E5B022" stroke-width="2" stroke-dasharray="4 4"/>
-                        <!-- text: Teks angka 500 yang digambar sebagai vektor -->
-                        <text x="50" y="55" font-family="var(--font-heading)" font-size="30" font-weight="bold" fill="#B38612" text-anchor="middle" dominant-baseline="middle">500</text>
-                    </svg>
-                </div>
-
             </div>
         </section>
 
@@ -732,7 +702,7 @@
             </div>
             <button class="btn-outline" data-target="screen-1" style="margin-top: 30px;">⬅ Kembali ke Beranda Utama</button>
         </section>
-
+    </div>
     </main>
 
     <script src="script.js?v=2"></script>
